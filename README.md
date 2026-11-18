@@ -24,8 +24,8 @@ app/
 ├── prisma/
 │   ├── schema.prisma      users, sessions, ai_credentials, briefs, ai_runs, pipeline_events, brief_notes
 │   ├── migrations/
-│   ├── seed.ts            seed 1 user admin (dari env)
-│   └── demo.ts            opsional: 14 brief contoh untuk demo pagination
+│   ├── seed.mjs           seed 1 user admin (dari env)
+│   └── demo.ts            opsional: 14 brief contoh untuk demo pagination (dev)
 ├── src/
 │   ├── app/               halaman: /, /login, /admin/briefs, /admin/briefs/[id], /admin/settings, /admin/users
 │   ├── actions/           server actions (auth, briefs, settings, users)
