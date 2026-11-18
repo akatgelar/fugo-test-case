@@ -8,7 +8,7 @@ const inputClass =
 
 export default function LoginForm() {
   const [state, action, pending] = useActionState(login, {});
-  const [email, setEmail] = useState('admin@fugocreative.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(false);
 
@@ -51,10 +51,7 @@ export default function LoginForm() {
       >
         {pending ? 'Memeriksa…' : 'Masuk'}
       </button>
-
-      <p className="text-center text-xs text-gray-400">
-        Kredensial default dari seeder: <span className="font-mono">admin@fugocreative.com</span> / <span className="font-mono">fugo2026</span>
-      </p>
+ 
     </form>
   );
 }
