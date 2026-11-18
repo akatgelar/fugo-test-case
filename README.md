@@ -31,8 +31,9 @@ app/
 │   ├── actions/           server actions (auth, briefs, settings, users)
 │   ├── components/        shell admin, form publik, form login, dialog tambah
 │   └── lib/               db, auth, AI pipeline, validasi, label/format, pipeline
-├── Dockerfile
-└── docker-compose.yml
+└── .docker/
+    ├── Dockerfile        multi-stage (image produksi)
+    └── docker-compose.yml
 ```
 
 ## Menjalankan lokal
@@ -61,12 +62,16 @@ npm run db:demo
 
 ```
 cd app
-docker compose up --build
+docker compose -f .docker/docker-compose.yml up --build
 # app: http://localhost:3000
 ```
 
 Compose menjalankan Postgres + aplikasi; saat start aplikasi menjalankan `prisma migrate deploy` dan seed admin.  
-Override kredensial: `ADMIN_EMAIL=... ADMIN_PASSWORD=... docker compose up --build`.
+Override kredensial: `ADMIN_EMAIL=... ADMIN_PASSWORD=... docker compose -f .docker/docker-compose.yml up --build`.
+
+Image produksi dibangun multi-stage (`.docker/Dockerfile`): dependency build & Next build terpisah dari image runtime,  
+runtime hanya berisi `node_modules` produksi + `.next` + Prisma client/migrasi. Seed memakai `prisma/seed.mjs` (Node biasa),  
+bukan `tsx`, sehingga devDependency tidak ikut ke image.
 
 ## Alur AI (tanpa queue)
 
