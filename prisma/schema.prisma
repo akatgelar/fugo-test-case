@@ -1,0 +1,182 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BudgetRange {
+  under_10
+  from_10_25
+  from_25_50
+  from_50_100
+  above_100
+}
+
+enum ServiceCategory {
+  branding
+  website
+  mobile_app
+  ai_automation
+  social_media
+  other
+}
+
+enum AiPriority {
+  high
+  medium
+  low
+}
+
+enum AiStatus {
+  pending
+  processing
+  succeeded
+  failed
+}
+
+enum PipelineStatus {
+  new
+  contacted
+  proposal
+  won
+  lost
+}
+
+enum RunStatus {
+  succeeded
+  failed
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  isActive     Boolean  @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions   Session[]
+  credentials AiCredential[]
+  events     PipelineEvent[]
+  notes      BriefNote[]
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String   @unique
+  ip        String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model AiCredential {
+  id          String   @id @default(uuid())
+  baseUrl     String
+  apiKey      String
+  model       String
+  isActive    Boolean  @default(false)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdBy User?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  runs      AiRun[]
+
+  @@unique([baseUrl, model])
+}
+
+model Brief {
+  id               String           @id @default(uuid())
+  ref              String           @unique
+  name             String
+  email            String
+  company          String
+  needDescription  String
+  budgetRange      BudgetRange
+  targetTimeline   DateTime         @db.Date
+  pipelineStatus   PipelineStatus   @default(new)
+  aiStatus         AiStatus         @default(pending)
+  aiAttemptCount   Int              @default(0)
+  aiLastError      String?
+  aiSummary        String?
+  aiServiceCategory ServiceCategory?
+  aiPriority       AiPriority?
+  aiPriorityReason String?
+  aiMissingInfo    Json?
+  aiModel          String?
+  aiCredentialId   String?
+  aiRawOutput      Json?
+  aiProcessedAt    DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  runs   AiRun[]
+  events PipelineEvent[]
+  notes  BriefNote[]
+
+  @@index([createdAt])
+  @@index([pipelineStatus])
+  @@index([aiStatus])
+  @@index([aiPriority])
+  @@index([aiServiceCategory])
+  @@index([email])
+}
+
+model AiRun {
+  id           String    @id @default(uuid())
+  briefId      String
+  credentialId String?
+  attempt      Int
+  status       RunStatus
+  model        String
+  baseUrl      String
+  latencyMs    Int
+  error        String?
+  rawOutput    Json?
+  createdAt    DateTime  @default(now())
+
+  brief      Brief         @relation(fields: [briefId], references: [id], onDelete: Cascade)
+  credential AiCredential? @relation(fields: [credentialId], references: [id], onDelete: SetNull)
+
+  @@index([briefId, createdAt])
+}
+
+model PipelineEvent {
+  id          String          @id @default(uuid())
+  briefId     String
+  fromStatus  PipelineStatus?
+  toStatus    PipelineStatus
+  changedById String?
+  note        String?
+  createdAt   DateTime        @default(now())
+
+  brief     Brief @relation(fields: [briefId], references: [id], onDelete: Cascade)
+  changedBy User? @relation(fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@index([briefId, createdAt])
+}
+
+model BriefNote {
+  id        String   @id @default(uuid())
+  briefId   String
+  authorId  String?
+  body      String
+  createdAt DateTime @default(now())
+
+  brief  Brief @relation(fields: [briefId], references: [id], onDelete: Cascade)
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([briefId, createdAt])
+}
