@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.github
+.docker
+.env
+.env.*
+!.env.example
+README.md
+screenshots
+*.log
+tsconfig.tsbuildinfo

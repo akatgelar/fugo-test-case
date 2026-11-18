@@ -1,0 +1,35 @@
+name: fugo-brief-intake
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: fugo
+      POSTGRES_PASSWORD: fugo
+      POSTGRES_DB: fugo
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fugo -d fugo"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  app:
+    image: ghcr.io/akatgelar/fugo-creative-test-case:latest
+    build:
+      context: ..
+      dockerfile: .docker/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://fugo:fugo@db:5432/fugo?schema=public
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@fugocreative.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-fugo2026}
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:
