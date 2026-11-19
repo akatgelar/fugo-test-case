@@ -125,5 +125,8 @@ npm run build
 
 ## Catatan pengerjaan
 
-*   UI memakai stylesheet dari template **TailAdmin v2** (Tailwind CSS + Alpine) yang disalin ke `src/app/tailadmin.css`;  
-    komponen React ditulis ulang untuk Next.js. Sebagian utility tambahan ada di `src/app/mockup.css`.
+*   UI memakai stylesheet dari template **TailAdmin v2** (Tailwind CSS + Alpine) [https://demo.tailadmin.com/](https://demo.tailadmin.com/) yang disalin ke `src/app/tailadmin.css`; 
+*   Komponen React ditulis ulang untuk Next.js. Sebagian utility tambahan ada di `src/app/mockup.css`.
+*   Tools workspace pakai Multica AI [https://www.multica.ai/](https://www.multica.ai/)
+*   Agent harness pakai Opencode [https://opencode.ai/](https://opencode.ai/)
+*   Model AI yang dipakai deepseek-v4-flash
